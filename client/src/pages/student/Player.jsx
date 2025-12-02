@@ -21,6 +21,20 @@ const Player = ({ }) => {
   const [playerData, setPlayerData] = useState(null);
   const [initialRating, setInitialRating] = useState(0);
 
+  const getYouTubeVideoId = (url) => {
+    if (!url) return "";
+    try {
+      const parsed = new URL(url);
+      const v = parsed.searchParams.get("v");
+      if (v) return v;
+      const parts = parsed.pathname.split("/").filter(Boolean);
+      return parts[parts.length - 1] || "";
+    } catch {
+      // If it's already a bare ID, just return it
+      return url;
+    }
+  };
+
   const getCourseData = () => {
     enrolledCourses.map((course) => {
       if (course._id === courseId) {
@@ -176,7 +190,7 @@ const Player = ({ }) => {
           playerData
             ? (
               <div>
-                <YouTube iframeClassName='w-full aspect-video' videoId={playerData.lectureUrl.split('/').pop()} />
+                <YouTube iframeClassName='w-full aspect-video' videoId={getYouTubeVideoId(playerData.lectureUrl)} />
                 <div className='flex justify-between items-center mt-1'>
                   <p className='text-xl '>{playerData.chapter}.{playerData.lecture} {playerData.lectureTitle}</p>
                   <button onClick={() => markLectureAsCompleted(playerData.lectureId)} className='text-blue-600'>{progressData && progressData.lectureCompleted.includes(playerData.lectureId) ? 'Completed' : 'Mark Complete'}</button>
